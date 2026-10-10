@@ -356,6 +356,402 @@ class SoundController {
     this.playTone(783.99, 'triangle', 0.2, 0.3);
     this.playTone(1046.50, 'triangle', 0.45, 0.48);
   }
+
+  // --- SAVANNAH WILDLIFE AUDIO SYNTHESIZER ---
+  createNoiseBuffer(duration = 1.0) {
+    if (!this.ctx) return null;
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    return buffer;
+  }
+
+  // 1. Lion / Leopard Roar & Growl
+  playLionRoar() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Guttural low-frequency sawtooth with pitch drop
+      const osc = this.ctx.createOscillator();
+      const oscGain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(85, now);
+      osc.frequency.exponentialRampToValueAtTime(130, now + 0.25);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.85);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(450, now);
+      filter.Q.setValueAtTime(2.5, now);
+
+      oscGain.gain.setValueAtTime(0.01, now);
+      oscGain.gain.linearRampToValueAtTime(0.28, now + 0.2);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+      osc.connect(filter);
+      filter.connect(oscGain);
+      oscGain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.95);
+
+      // Breath noise overlay
+      const noiseBuffer = this.createNoiseBuffer(0.85);
+      if (noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const noiseFilter = this.ctx.createBiquadFilter();
+        const noiseGain = this.ctx.createGain();
+
+        noiseFilter.type = 'lowpass';
+        noiseFilter.frequency.setValueAtTime(320, now);
+
+        noiseGain.gain.setValueAtTime(0.01, now);
+        noiseGain.gain.linearRampToValueAtTime(0.22, now + 0.25);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 0.9);
+      }
+    } catch (e) {
+      console.warn("Lion roar synth error", e);
+    }
+  }
+
+  // 2. Hippo Grunt & Water Snort
+  playHippoGrunt() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Low sub-bass resonant throat pulse
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(75, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.35);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.35, now + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.45);
+
+      // Snort noise burst
+      const noiseBuffer = this.createNoiseBuffer(0.35);
+      if (noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        const nGain = this.ctx.createGain();
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(260, now);
+        filter.Q.setValueAtTime(3.0, now);
+
+        nGain.gain.setValueAtTime(0.01, now);
+        nGain.gain.linearRampToValueAtTime(0.28, now + 0.08);
+        nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        noise.connect(filter);
+        filter.connect(nGain);
+        nGain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 0.4);
+      }
+    } catch (e) {
+      console.warn("Hippo grunt synth error", e);
+    }
+  }
+
+  // 3. Serpent Hiss (Black Mamba, Puff Adder, Boomslang)
+  playSerpentHiss() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const noiseBuffer = this.createNoiseBuffer(0.7);
+      if (noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(4500, now);
+        filter.Q.setValueAtTime(3.5, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.32, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 0.7);
+      }
+    } catch (e) {
+      console.warn("Serpent hiss synth error", e);
+    }
+  }
+
+  // 4. Elephant Trumpet
+  playElephantTrumpet() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(350, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.25);
+      osc.frequency.exponentialRampToValueAtTime(400, now + 0.75);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1400, now);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.24, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.85);
+    } catch (e) {
+      console.warn("Elephant trumpet synth error", e);
+    }
+  }
+
+  // 5. Crocodile Snap & Rumble
+  playCrocodileSnap() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(95, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.25);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (e) {
+      console.warn("Crocodile snap synth error", e);
+    }
+  }
+
+  // 6. Hyena Cackle / Wild Dog
+  playHyenaLaugh() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      [0, 0.12, 0.24].forEach((delay, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(420 + idx * 80, now + delay);
+        osc.frequency.exponentialRampToValueAtTime(660 + idx * 60, now + delay + 0.08);
+
+        gain.gain.setValueAtTime(0.18, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.1);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + delay);
+        osc.stop(now + delay + 0.12);
+      });
+    } catch (e) {
+      console.warn("Hyena laugh synth error", e);
+    }
+  }
+
+  // 7. Mosquito / Tsetse Fly Buzz
+  playInsectBuzz() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.linearRampToValueAtTime(480, now + 0.25);
+      osc.frequency.linearRampToValueAtTime(540, now + 0.45);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.55);
+    } catch (e) {
+      console.warn("Insect buzz synth error", e);
+    }
+  }
+
+  // 8. Baboon Alarm Bark
+  playPrimateBark() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (e) {
+      console.warn("Primate bark synth error", e);
+    }
+  }
+
+  // 9. Heavy Bellow / Thump (Cape Buffalo, Rhino, Giraffe, Ostrich)
+  playHeavyBellow() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(55, now + 0.45);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.55);
+    } catch (e) {
+      console.warn("Heavy bellow synth error", e);
+    }
+  }
+
+  // 10. Screen Transition Sound (Savannah Wind / Grass Rustle)
+  playScreenTransition() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const noiseBuffer = this.createNoiseBuffer(0.5);
+      if (noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(350, now);
+        filter.frequency.exponentialRampToValueAtTime(1400, now + 0.2);
+        filter.frequency.exponentialRampToValueAtTime(300, now + 0.45);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 0.5);
+      }
+    } catch (e) {
+      console.warn("Transition sound error", e);
+    }
+  }
+
+  // Dispatcher for Animal Sound Effects
+  playAnimalSoundForQuestion(question) {
+    if (!this.enabled || !question) return;
+    const name = (question.animalName || '').toLowerCase();
+
+    setTimeout(() => {
+      if (name.includes('hippo')) {
+        this.playHippoGrunt();
+      } else if (name.includes('mamba') || name.includes('adder') || name.includes('boomslang') || name.includes('snake')) {
+        this.playSerpentHiss();
+      } else if (name.includes('lion') || name.includes('leopard') || name.includes('cheetah')) {
+        this.playLionRoar();
+      } else if (name.includes('croc')) {
+        this.playCrocodileSnap();
+      } else if (name.includes('elephant')) {
+        this.playElephantTrumpet();
+      } else if (name.includes('hyena') || name.includes('dog')) {
+        this.playHyenaLaugh();
+      } else if (name.includes('mosquito') || name.includes('fly')) {
+        this.playInsectBuzz();
+      } else if (name.includes('baboon')) {
+        this.playPrimateBark();
+      } else if (name.includes('buffalo') || name.includes('rhino') || name.includes('badger')) {
+        this.playHeavyBellow();
+      } else if (name.includes('ostrich') || name.includes('giraffe')) {
+        this.playHeavyBellow();
+      } else {
+        this.playLionRoar();
+      }
+    }, 280);
+  }
 }
 
 // App State
@@ -653,8 +1049,10 @@ function selectAnswer(selectedIndex) {
   if (isCorrect) {
     state.score += 5;
     sound.playCorrect();
+    sound.playAnimalSoundForQuestion(q);
   } else {
     sound.playIncorrect();
+    sound.playAnimalSoundForQuestion(q);
   }
 
   // Highlight option cards
@@ -677,6 +1075,7 @@ function handleTimeExpired() {
 
   sound.playTimeExpired();
   const q = QUESTIONS[state.currentQuestionIndex];
+  sound.playAnimalSoundForQuestion(q);
 
   state.userAnswers.push({
     questionId: q.id,
@@ -734,10 +1133,43 @@ function displayFeedback(isCorrect, isTimeExpired) {
   }, 100);
 }
 
-function nextQuestion() {
-  if (state.currentQuestionIndex < QUESTIONS.length - 1) {
-    loadQuestion(state.currentQuestionIndex + 1);
+function transitionToQuestion(nextIndex) {
+  const animatedTargets = [
+    document.getElementById('animal-badge-card'),
+    document.querySelector('.question-card'),
+    document.getElementById('options-container')
+  ].filter(Boolean);
+
+  // Trigger smooth CSS fade-out animation
+  animatedTargets.forEach(el => {
+    el.classList.remove('question-animating-in');
+    el.classList.add('question-animating-out');
+  });
+
+  // Wait 160ms for fade-out before loading next question content
+  setTimeout(() => {
+    loadQuestion(nextIndex);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Trigger smooth CSS fade-in animation
+    animatedTargets.forEach(el => {
+      el.classList.remove('question-animating-out');
+      el.classList.add('question-animating-in');
+    });
+
+    // Clean up animation class after completion
+    setTimeout(() => {
+      animatedTargets.forEach(el => {
+        el.classList.remove('question-animating-in');
+      });
+    }, 320);
+  }, 160);
+}
+
+function nextQuestion() {
+  sound.playScreenTransition();
+  if (state.currentQuestionIndex < QUESTIONS.length - 1) {
+    transitionToQuestion(state.currentQuestionIndex + 1);
   } else {
     showResults();
   }
@@ -747,6 +1179,7 @@ function nextQuestion() {
 function showResults() {
   clearInterval(state.timerInterval);
   sound.playFanfare();
+  setTimeout(() => sound.playLionRoar(), 500);
 
   quizScreen.classList.remove('active');
   resultScreen.classList.add('active');
@@ -852,26 +1285,29 @@ function renderFieldGuide(filter = 'all') {
 // Event Listeners
 startBtn.addEventListener('click', () => {
   sound.initCtx();
+  sound.playScreenTransition();
+  setTimeout(() => sound.playLionRoar(), 250);
   introScreen.classList.remove('active');
   quizScreen.classList.add('active');
   state.score = 0;
   state.userAnswers = [];
-  loadQuestion(0);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  transitionToQuestion(0);
 });
 
 nextQuestionBtn.addEventListener('click', nextQuestion);
 
 retakeBtn.addEventListener('click', () => {
+  sound.playScreenTransition();
+  setTimeout(() => sound.playLionRoar(), 250);
   resultScreen.classList.remove('active');
   quizScreen.classList.add('active');
   state.score = 0;
   state.userAnswers = [];
-  loadQuestion(0);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  transitionToQuestion(0);
 });
 
 backCampBtn.addEventListener('click', () => {
+  sound.playScreenTransition();
   resultScreen.classList.remove('active');
   introScreen.classList.add('active');
   drawSavannahBanner('hero-canvas');
@@ -903,6 +1339,109 @@ filterChips.forEach(chip => {
     renderFieldGuide(chip.dataset.filter);
   });
 });
+
+// Social Share Integration
+const shareResultsBtn = document.getElementById('share-results-btn');
+const shareModal = document.getElementById('share-modal');
+const closeShareModal = document.getElementById('close-share-modal');
+const copyClipboardBtn = document.getElementById('copy-clipboard-btn');
+const copyStatus = document.getElementById('copy-status');
+const previewBadge = document.getElementById('preview-badge');
+const previewText = document.getElementById('preview-text');
+const shareXLink = document.getElementById('share-x-link');
+const shareWaLink = document.getElementById('share-wa-link');
+
+function getSharePayload() {
+  const totalPoints = state.score;
+  const percentage = Math.round((totalPoints / 100) * 100);
+  let rankTitle = "Savannah Tourist 🏕️";
+  if (percentage > 70) rankTitle = "Apex Predator 🦁";
+  else if (percentage > 30) rankTitle = "Ranger Trainee 🧭";
+
+  const text = `I scored ${totalPoints}/100 pts (${percentage}%) on the Scariest Animals of the Savannah Quiz and earned the rank of ${rankTitle}! Can you survive Africa's 20 deadliest creatures?`;
+  return {
+    title: "Scariest Animals of the Savannah Quiz",
+    text: text,
+    rank: rankTitle,
+    url: window.location.href
+  };
+}
+
+function openShareModal() {
+  const payload = getSharePayload();
+  previewBadge.textContent = payload.rank.toUpperCase();
+  previewText.textContent = `"${payload.text}"`;
+  copyStatus.textContent = "";
+
+  // Configure X (Twitter) and WhatsApp links
+  const encodedText = encodeURIComponent(`${payload.text} #SavannahQuiz #AfricanWildlife`);
+  shareXLink.href = `https://twitter.com/intent/tweet?text=${encodedText}`;
+  shareWaLink.href = `https://api.whatsapp.com/send?text=${encodedText}`;
+
+  // Try Web Share API if supported on mobile
+  if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+    navigator.share({
+      title: payload.title,
+      text: payload.text,
+      url: window.location.href
+    }).catch(() => {
+      // User cancelled or share failed, show fallback modal
+      shareModal.classList.remove('hidden');
+    });
+  } else {
+    shareModal.classList.remove('hidden');
+  }
+}
+
+if (shareResultsBtn) {
+  shareResultsBtn.addEventListener('click', openShareModal);
+}
+
+if (closeShareModal) {
+  closeShareModal.addEventListener('click', () => {
+    shareModal.classList.add('hidden');
+  });
+}
+
+if (shareModal) {
+  shareModal.addEventListener('click', (e) => {
+    if (e.target === shareModal) {
+      shareModal.classList.add('hidden');
+    }
+  });
+}
+
+if (copyClipboardBtn) {
+  copyClipboardBtn.addEventListener('click', () => {
+    const payload = getSharePayload();
+    const fullShareText = `${payload.text}\nTest your wildlife survival skills: ${window.location.href}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullShareText).then(() => {
+        copyStatus.textContent = "✓ Copied!";
+        setTimeout(() => { copyStatus.textContent = ""; }, 3000);
+      }).catch(() => {
+        fallbackCopyText(fullShareText);
+      });
+    } else {
+      fallbackCopyText(fullShareText);
+    }
+  });
+}
+
+function fallbackCopyText(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    copyStatus.textContent = "✓ Copied!";
+    setTimeout(() => { copyStatus.textContent = ""; }, 3000);
+  } catch (err) {
+    copyStatus.textContent = "Press Ctrl+C to copy";
+  }
+  document.body.removeChild(textArea);
+}
 
 // Initial Setup
 window.addEventListener('DOMContentLoaded', () => {

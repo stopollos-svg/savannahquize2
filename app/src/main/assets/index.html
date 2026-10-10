@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scariest Animals of the Savannah Quiz</title>
+  <meta name="description" content="Test your wildlife instincts against Africa's 20 deadliest creatures with Ranger Kofi. Interactive quiz with timer, sounds, and ranks!">
+  <meta name="theme-color" content="#1A120B">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦁</text></svg>">
+  <!-- Open Graph / Social Sharing for Vercel -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Scariest Animals of the Savannah Quiz">
+  <meta property="og:description" content="Can you survive Africa's 20 deadliest beasts? Take the Savannah Quiz hosted by Ranger Kofi!">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Scariest Animals of the Savannah Quiz">
+  <meta name="twitter:description" content="Test your instincts against Africa's 20 deadliest creatures. Earn the rank of Apex Predator!">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -314,6 +325,14 @@
           </div>
         </div>
 
+        <!-- Social Media Share Action Card -->
+        <div class="share-action-card">
+          <button id="share-results-btn" class="primary-btn glow-btn share-cta-btn">
+            <span>📢 Share Expedition Results</span>
+            <span class="share-icon-mini">↗</span>
+          </button>
+        </div>
+
         <!-- Action Buttons -->
         <div class="action-buttons-grid">
           <button id="retake-btn" class="primary-btn">
@@ -340,6 +359,40 @@
         </div>
       </div>
     </section>
+
+    <!-- Social Media Share Modal -->
+    <div id="share-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>📢 Share Your Savannah Rank</h3>
+          <button id="close-share-modal" class="modal-close-btn" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="share-preview-card" id="share-preview-card">
+            <div class="preview-badge" id="preview-badge">🦁 APEX PREDATOR</div>
+            <p class="preview-text" id="preview-text">
+              "I scored 85 / 100 pts (85%) on the Scariest Animals of the Savannah Quiz and earned the rank of Apex Predator 🦁! Can you survive Africa's deadliest creatures?"
+            </p>
+            <div class="preview-footer">#SavannahQuiz #AfricanWildlife #ApexPredator</div>
+          </div>
+
+          <div class="share-methods">
+            <button id="copy-clipboard-btn" class="share-method-btn">
+              <span>📋 Copy to Clipboard</span>
+              <span id="copy-status" class="copy-status"></span>
+            </button>
+            <div class="social-links-row">
+              <a id="share-x-link" href="#" target="_blank" rel="noopener noreferrer" class="social-chip x-chip">
+                <span>Post on 𝕏 (Twitter)</span>
+              </a>
+              <a id="share-wa-link" href="#" target="_blank" rel="noopener noreferrer" class="social-chip wa-chip">
+                <span>Share on WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

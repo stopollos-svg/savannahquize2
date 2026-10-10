@@ -1,0 +1,22 @@
+{
+  "name": "scariest-animals-savannah-quiz",
+  "version": "1.0.0",
+  "description": "Scariest Animals of the Savannah Quiz Web Application",
+  "main": "public/index.html",
+  "scripts": {
+    "build": "echo 'Savannah Quiz ready for Vercel deployment'",
+    "start": "npx -y serve public",
+    "test": "node --check public/app.js"
+  },
+  "keywords": [
+    "savannah",
+    "quiz",
+    "wildlife",
+    "africa",
+    "animals",
+    "educational",
+    "vercel"
+  ],
+  "author": "Ranger Kofi",
+  "license": "MIT"
+}

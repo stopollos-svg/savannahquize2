@@ -48,6 +48,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import android.content.Intent
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -86,6 +91,109 @@ fun ResultScreen(
     val totalCount = uiState.totalQuestions
     var reviewFilter by remember { mutableStateOf(ReviewFilter.ALL) }
     var expandedQuestionId by remember { mutableStateOf<Int?>(null) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var copiedConfirmation by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val shareText = "🦁 Scariest Animals of the Savannah Quiz!\nI scored ${uiState.score} / 100 pts ($percentage%) and earned the rank of ${rank.title} ${rank.badgeEmoji}!\nCan you survive Africa's 20 deadliest creatures?"
+
+    if (showShareDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showShareDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "📢 ", fontSize = 20.sp)
+                    Text(
+                        text = "Share Expedition Rank",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = SavannahGold
+                    )
+                }
+            },
+            text = {
+                Column {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFF1E130A),
+                        border = BorderStroke(1.dp, SavannahAmber),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "MOCK SOCIAL POST PREVIEW",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = SavannahAmber,
+                                letterSpacing = 1.sp
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = shareText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = SavannahCream,
+                                lineHeight = 20.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "#SavannahQuiz #AfricanWildlife #${rank.title.replace(" ", "")}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SavannahGold.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    if (copiedConfirmation) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF1B4D20),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "✓ Copied to clipboard!",
+                                color = Color(0xFFA5D6A7),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(8.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(shareText))
+                        copiedConfirmation = true
+                        try {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                                type = "text/plain"
+                            }
+                            context.startActivity(Intent.createChooser(sendIntent, "Share Expedition Rank"))
+                        } catch (_: Exception) {}
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = SavannahAmber, contentColor = Color(0xFF221100))
+                ) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Copy & Share", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showShareDialog = false }) {
+                    Text("Close", color = SavannahCream)
+                }
+            },
+            containerColor = Color(0xFF2B1B10),
+            tonalElevation = 6.dp
+        )
+    }
 
     val percentageProgress by animateFloatAsState(
         targetValue = percentage / 100f,
@@ -262,6 +370,38 @@ fun ResultScreen(
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Social Media Share Button
+                Button(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(shareText))
+                        copiedConfirmation = true
+                        try {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                                type = "text/plain"
+                            }
+                            context.startActivity(Intent.createChooser(sendIntent, "Share Expedition Rank"))
+                        } catch (_: Exception) {}
+                        showShareDialog = true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .testTag("share_results_button"),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE65100),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "📢 Share Expedition Results", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Action Buttons
                 Row(

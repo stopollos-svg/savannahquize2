@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
 fun SavannahMainContainer(
     viewModel: QuizViewModel = viewModel()
 ) {
-    var viewMode by remember { mutableStateOf(AppViewMode.WEB_APP) }
+    var viewMode by remember { mutableStateOf(AppViewMode.NATIVE_COMPOSE) }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
 
     Scaffold(
@@ -168,7 +168,8 @@ fun SavannahMainContainer(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (viewMode == AppViewMode.WEB_APP) {
                     SavannahWebAppView(
-                        onWebViewCreated = { webViewInstance = it }
+                        onWebViewCreated = { webViewInstance = it },
+                        onFallbackToNative = { viewMode = AppViewMode.NATIVE_COMPOSE }
                     )
                 } else {
                     SavannahNativeQuizView(viewModel = viewModel)
@@ -181,7 +182,8 @@ fun SavannahMainContainer(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun SavannahWebAppView(
-    onWebViewCreated: (WebView) -> Unit
+    onWebViewCreated: (WebView) -> Unit,
+    onFallbackToNative: () -> Unit = {}
 ) {
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
 
@@ -191,33 +193,45 @@ fun SavannahWebAppView(
 
     AndroidView(
         factory = { ctx ->
-            WebView(ctx).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                setBackgroundColor(AndroidColor.parseColor("#120B06"))
+            try {
+                WebView(ctx).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    // Use software layer rendering to bypass missing Mesa GPU rendernodes in emulator
+                    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
+                    setBackgroundColor(AndroidColor.parseColor("#120B06"))
 
-                settings.apply {
-                    javaScriptEnabled = true
-                    domStorageEnabled = true
-                    allowFileAccess = true
-                    mediaPlaybackRequiresUserGesture = false
-                    useWideViewPort = true
-                    loadWithOverviewMode = true
-                    cacheMode = WebSettings.LOAD_NO_CACHE
-                }
-
-                webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        super.onPageFinished(view, url)
+                    settings.apply {
+                        javaScriptEnabled = true
+                        domStorageEnabled = true
+                        allowFileAccess = true
+                        mediaPlaybackRequiresUserGesture = false
+                        useWideViewPort = true
+                        loadWithOverviewMode = true
+                        cacheMode = WebSettings.LOAD_NO_CACHE
                     }
-                }
-                webChromeClient = WebChromeClient()
 
-                loadUrl("file:///android_asset/index.html")
-                webViewRef = this
-                onWebViewCreated(this)
+                    webViewClient = object : WebViewClient() {
+                        override fun onReceivedError(
+                            view: WebView?,
+                            errorCode: Int,
+                            description: String?,
+                            failingUrl: String?
+                        ) {
+                            super.onReceivedError(view, errorCode, description, failingUrl)
+                        }
+                    }
+                    webChromeClient = WebChromeClient()
+
+                    loadUrl("file:///android_asset/index.html")
+                    webViewRef = this
+                    onWebViewCreated(this)
+                }
+            } catch (e: Exception) {
+                onFallbackToNative()
+                android.view.View(ctx)
             }
         },
         modifier = Modifier.fillMaxSize()

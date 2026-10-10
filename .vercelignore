@@ -1,0 +1,10 @@
+# Android Gradle caches and build outputs
+.gradle
+.kotlin
+app/build
+build
+.build-outputs
+*.keystore*
+*.jks
+*.iml
+.idea
