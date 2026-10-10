@@ -4,9 +4,9 @@
   "description": "Scariest Animals of the Savannah Quiz Web Application",
   "main": "public/index.html",
   "scripts": {
-    "build": "echo 'Savannah Quiz ready for Vercel deployment'",
+    "build": "node build.js",
     "start": "npx -y serve public",
-    "test": "node --check public/app.js"
+    "test": "node --check public/app.js && node build.js"
   },
   "keywords": [
     "savannah",

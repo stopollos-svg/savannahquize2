@@ -1,4 +1,4 @@
-# Android Gradle caches and build outputs
+# Android source, build caches and keystores
 .gradle
 .kotlin
 app/build
@@ -8,3 +8,7 @@ build
 *.jks
 *.iml
 .idea
+gradle/
+app/src/main/java
+app/src/main/res
+

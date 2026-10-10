@@ -129,6 +129,72 @@ fun IntroScreen(
                 message = "Jambo! Welcome to the wildest challenge in Africa! I'll test whether you have the survival instincts to outsmart our 20 deadliest creatures—from stealthy mambas to 2-ton river giants. Are you ready?"
             )
 
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Ludo Magic Savannah App Promo Card
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFF261509),
+                border = BorderStroke(1.5.dp, Color(0xFFE65100))
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0x33FFA000),
+                        border = BorderStroke(1.dp, SavannahAmber)
+                    ) {
+                        Text(
+                            text = "🌟 RECOMMENDED APP",
+                            color = SavannahAmber,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Download our LUDO MAGIC SAVANNAH APP on Google Play Store for more wildlife adventures & multiplayer savanna fun!",
+                        color = SavannahCream,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 18.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = Color.Black,
+                        border = BorderStroke(1.dp, Color(0x66FFFFFF))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "▶", color = Color(0xFF4285F4), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    text = "GET IT ON",
+                                    color = Color(0xCCFFFFFF),
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Google Play Store",
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(18.dp))
 
             // Quiz Rules Overview Card

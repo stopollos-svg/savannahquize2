@@ -194,6 +194,20 @@ fun SavannahWebAppView(
     AndroidView(
         factory = { ctx ->
             try {
+                // Ensure WebView cache directories exist to avoid Chromium simple_file_enumerator log warnings
+                try {
+                    val webViewCache = java.io.File(ctx.cacheDir, "WebView/Default/HTTP Cache/Code Cache/wasm")
+                    if (!webViewCache.exists()) {
+                        webViewCache.mkdirs()
+                    }
+                    val indexDir = java.io.File(webViewCache, "index-dir")
+                    if (!indexDir.exists()) {
+                        indexDir.mkdirs()
+                    }
+                } catch (_: Exception) {
+                    // Non-critical directory setup
+                }
+
                 WebView(ctx).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
